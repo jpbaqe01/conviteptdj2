@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>PTDJ · Confirmação de presença</title>
+<meta name="description" content="Confirme sua presença na lista de convidados.">
+<link rel="icon" href="assets/ptdj-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#040103;
+    --bg-2:#0c0205;
+    --ink:#f6eaea;
+    --ink-soft:rgba(246,234,234,.72);
+    --red:#ff1f3d;
+    --red-deep:#7d0012;
+    --red-glow:rgba(255,31,61,.55);
+    --line:rgba(255,80,100,.35);
+    --serif:"Cormorant Garamond", "Times New Roman", serif;
+    --sans:"Jost", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#040103; --ink:#f6eaea; --ink-soft:rgba(246,234,234,.72);
+    }
+  }
+  :root[data-theme="dark"]{ --bg:#040103; --ink:#f6eaea; --ink-soft:rgba(246,234,234,.72); }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100%}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-weight:300;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    min-height:100svh;
+  }
+
+  /* ---------- atmosfera: luz vermelha + fumaça ---------- */
+  .stage{
+    position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+    background:
+      linear-gradient(180deg, rgba(3,0,1,.25), rgba(3,0,1,.55)),
+      url("assets/background-4k.webp") center bottom / cover no-repeat,
+      #030001;
+  }
+  .smoke{
+    position:absolute;border-radius:50%;filter:blur(60px);opacity:.55;
+    background:radial-gradient(closest-side, rgba(255,40,70,.6), rgba(125,0,18,.0));
+    animation:drift 16s ease-in-out infinite alternate;
+  }
+  .smoke.a{width:95vmax;height:55vmax;left:-25vmax;bottom:-18vmax}
+  .smoke.b{width:80vmax;height:50vmax;right:-30vmax;top:-10vmax;animation-duration:21s;animation-delay:-6s}
+  .smoke.c{width:60vmax;height:40vmax;left:20vmax;top:35vh;opacity:.28;animation-duration:27s;animation-delay:-11s}
+  @keyframes drift{
+    0%{transform:translate3d(0,0,0) scale(1)}
+    100%{transform:translate3d(6vw,-4vh,0) scale(1.12)}
+  }
+  .grain{
+    position:absolute;inset:-50%;opacity:.07;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  /* ---------- preloader ---------- */
+  .preloader{
+    position:fixed;inset:0;z-index:50;display:grid;place-items:center;
+    background:#020001;
+    transition:opacity .9s ease, visibility .9s;
+  }
+  .preloader.done{opacity:0;visibility:hidden}
+  .pre-core{position:relative;display:grid;place-items:center;text-align:center}
+  .pre-glow{
+    position:absolute;width:min(70vw,420px);aspect-ratio:1;border-radius:50%;
+    background:radial-gradient(closest-side, rgba(255,31,61,.55), rgba(125,0,18,.15) 60%, transparent 72%);
+    filter:blur(10px);animation:pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{transform:scale(.92);opacity:.65}50%{transform:scale(1.06);opacity:1}}
+  .pre-logo{
+    position:relative;width:min(44vw,200px);height:auto;
+    opacity:0;transform:scale(.9);filter:drop-shadow(0 0 18px rgba(255,31,61,.85));
+    animation:logoIn 1.6s cubic-bezier(.2,.7,.2,1) .15s forwards;
+  }
+  @keyframes logoIn{
+    0%{opacity:0;transform:scale(.9);filter:blur(10px) drop-shadow(0 0 0 rgba(255,31,61,0))}
+    100%{opacity:1;transform:scale(1);filter:blur(0) drop-shadow(0 0 18px rgba(255,31,61,.85))}
+  }
+  .pre-line{
+    position:relative;margin-top:28px;width:min(56vw,240px);height:1px;background:rgba(255,80,100,.18);overflow:hidden;
+  }
+  .pre-line::after{
+    content:"";position:absolute;inset:0;transform:translateX(-100%);
+    background:linear-gradient(90deg, transparent, var(--red), transparent);
+    animation:sweep 1.8s ease-in-out infinite;
+  }
+  @keyframes sweep{to{transform:translateX(100%)}}
+  .pre-kicker{
+    position:relative;margin-top:18px;font-size:11px;letter-spacing:.42em;text-transform:uppercase;color:var(--ink-soft);
+    opacity:0;animation:fadeUp 1s ease .9s forwards;
+  }
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ---------- conteúdo ---------- */
+  main{
+    position:relative;z-index:1;min-height:100svh;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:48px 16px 40px;
+    opacity:0;transform:translateY(14px);transition:opacity 1.1s ease .2s, transform 1.1s ease .2s;
+  }
+  main.in{opacity:1;transform:none}
+  .wrap{width:100%;max-width:440px}
+
+  .brand{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:26px}
+  .brand img{width:96px;height:auto;filter:drop-shadow(0 0 14px rgba(255,31,61,.55))}
+  .eyebrow{margin-top:18px;font-size:11px;letter-spacing:.42em;text-transform:uppercase;color:var(--ink-soft)}
+  h1{
+    margin-top:12px;font-family:var(--serif);font-weight:500;font-style:italic;
+    font-size:clamp(34px,8.4vw,44px);line-height:1.02;letter-spacing:.01em;
+    background:linear-gradient(180deg,#fff 10%, #ffb3bd 60%, #ff3b57 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .lede{
+    margin-top:14px;font-family:var(--serif);font-size:19px;line-height:1.45;color:var(--ink-soft);
+  }
+
+  .card{
+    position:relative;padding:30px 24px 26px;border-radius:4px;
+    background:linear-gradient(180deg, rgba(20,3,7,.82), rgba(8,1,3,.92));
+    border:1px solid var(--line);
+    box-shadow:0 0 0 1px rgba(0,0,0,.6) inset, 0 30px 80px -20px rgba(255,31,61,.35), 0 0 60px -30px var(--red-glow);
+    backdrop-filter:blur(6px);
+  }
+  .card::before{
+    content:"";position:absolute;inset:6px;border:1px solid rgba(255,80,100,.12);border-radius:2px;pointer-events:none;
+  }
+  /* luz vermelha que varre a borda do card: destaque do formulário */
+  .card::after{
+    content:"";position:absolute;inset:-1px;border-radius:4px;pointer-events:none;
+    background:conic-gradient(from var(--angle,0deg), transparent 0 70%, rgba(255,31,61,.9) 80%, transparent 90%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    padding:1px; animation:spin 6s linear infinite;
+  }
+  @property --angle{syntax:"<angle>";initial-value:0deg;inherits:false}
+  @keyframes spin{to{--angle:360deg}}
+  .card{box-shadow:0 0 0 1px rgba(0,0,0,.6) inset, 0 40px 90px -25px rgba(255,31,61,.5), 0 0 90px -20px var(--red-glow)}
+
+  form{position:relative;display:grid;gap:22px}
+  .field{display:grid;gap:8px}
+  label, .legend{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-soft)}
+  input[type="text"], input[type="tel"]{
+    width:100%;background:transparent;border:0;border-bottom:1px solid rgba(255,80,100,.4);
+    color:var(--ink);font:400 18px/1.2 var(--sans);letter-spacing:.02em;padding:8px 0 10px;border-radius:0;
+    transition:border-color .25s, box-shadow .25s;
+    -webkit-appearance:none;appearance:none;
+  }
+  input::placeholder{color:rgba(246,234,234,.32)}
+  input:focus{outline:none;border-bottom-color:var(--red);box-shadow:0 10px 18px -14px var(--red-glow)}
+  input[aria-invalid="true"]{border-bottom-color:#ff6b7f}
+  .hint{font-size:12px;color:rgba(246,234,234,.5);letter-spacing:.02em;min-height:1em}
+  .err{font-size:12px;color:#ff8a98;min-height:1em;letter-spacing:.02em}
+
+  .at{display:flex;align-items:baseline;gap:6px}
+  .at span{font-family:var(--serif);font-size:20px;color:var(--red)}
+  .at input{padding-left:0}
+
+  .seg{position:relative;display:grid;grid-template-columns:1fr 1fr;border:1px solid rgba(255,80,100,.4);border-radius:999px;padding:3px;gap:3px}
+  .seg input{position:absolute;opacity:0;pointer-events:none}
+  .seg label{
+    text-align:center;padding:10px 0;border-radius:999px;cursor:pointer;color:var(--ink-soft);
+    letter-spacing:.24em;transition:background .25s, color .25s, box-shadow .25s;
+  }
+  .seg input:checked + label{background:linear-gradient(180deg,#ff2a48,#8a0014);color:#fff;box-shadow:0 0 22px -4px var(--red-glow)}
+  .seg input:focus-visible + label{outline:1px solid var(--red);outline-offset:2px}
+
+  .consent{display:grid;grid-template-columns:20px 1fr;gap:12px;align-items:start;font-size:13px;line-height:1.5;color:var(--ink-soft)}
+  .consent input{appearance:none;-webkit-appearance:none;width:20px;height:20px;margin-top:1px;border:1px solid rgba(255,80,100,.6);border-radius:2px;background:transparent;display:grid;place-items:center;cursor:pointer}
+  .consent input:checked{background:var(--red);border-color:var(--red);box-shadow:0 0 14px -2px var(--red-glow)}
+  .consent input:checked::after{content:"";width:6px;height:10px;border-right:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(45deg) translate(-1px,-1px)}
+  .consent input:focus-visible{outline:1px solid var(--red);outline-offset:2px}
+  .consent a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--red)}
+
+  .btn{
+    position:relative;margin-top:4px;width:100%;padding:17px 20px;border:0;border-radius:999px;cursor:pointer;
+    font:500 13px/1 var(--sans);letter-spacing:.32em;text-transform:uppercase;color:#fff;
+    background:linear-gradient(180deg,#ff2a48 0%,#b0001f 55%,#6f000f 100%);
+    box-shadow:0 14px 34px -10px var(--red-glow), inset 0 1px 0 rgba(255,255,255,.25);
+    transition:transform .2s, box-shadow .3s, filter .3s;
+  }
+  .btn:hover{transform:translateY(-1px);box-shadow:0 18px 44px -8px var(--red-glow), inset 0 1px 0 rgba(255,255,255,.3)}
+  .btn:active{transform:translateY(0)}
+  .btn:focus-visible{outline:1px solid #fff;outline-offset:3px}
+  .btn[disabled]{opacity:.6;cursor:progress;transform:none}
+  .status{text-align:center;font-size:13px;min-height:1.2em;color:#ff8a98}
+  .fine{margin-top:18px;text-align:center;font-size:12px;line-height:1.6;color:rgba(246,234,234,.45)}
+
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+
+
+  /* preloader: véu de fumaça que se abre + traço de batom */
+  .veu{position:absolute;top:-10%;bottom:-10%;width:56%;z-index:0;filter:blur(28px);pointer-events:none;
+    background:radial-gradient(70% 60% at 50% 50%, rgba(255,31,61,.55), rgba(125,0,18,.35) 55%, rgba(2,0,1,0) 75%);}
+  .veu.l{left:-6%;animation:veuL 1.5s cubic-bezier(.6,0,.2,1) 1.6s forwards}
+  .veu.r{right:-6%;animation:veuR 1.5s cubic-bezier(.6,0,.2,1) 1.6s forwards}
+  @keyframes veuL{to{transform:translateX(-95%)}}
+  @keyframes veuR{to{transform:translateX(95%)}}
+  .pre-core{z-index:1}
+  .batom{position:relative;width:min(50vw,190px);margin-top:-6px;overflow:visible}
+  .batom path{fill:none;stroke:#ff1f3d;stroke-width:5;stroke-linecap:round;
+    filter:drop-shadow(0 0 6px rgba(255,31,61,.9));
+    stroke-dasharray:260;stroke-dashoffset:260;animation:batom 1.1s ease-out .9s forwards}
+  @keyframes batom{to{stroke-dashoffset:0}}
+
+  /* botão invertido ao passar ou clicar */
+  .btn:hover,.btn:focus-visible,.btn:active{background:#fff;color:#8a0014;box-shadow:0 0 0 1px #ff1f3d, 0 14px 34px -10px var(--red-glow)}
+  .btn:hover::after,.btn:focus-visible::after,.btn:active::after{display:none}
+
+  /* botão: brilho que varre a superfície + anel vermelho */
+  .btn{overflow:hidden;outline:1px solid rgba(255,80,100,.45);outline-offset:4px}
+  .btn::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:38%;
+    background:linear-gradient(100deg, transparent, rgba(255,255,255,.42), transparent);
+    transform:skewX(-20deg);animation:shine 3.4s ease-in-out infinite;pointer-events:none}
+  @keyframes shine{0%,55%{left:-60%}100%{left:130%}}
+
+  .rodape{margin-top:22px;text-align:center}
+  .logos{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .resumo{margin:22px auto 0;max-width:330px;display:grid;grid-template-columns:auto 1fr;gap:8px 14px;text-align:left;
+    padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .resumo dt{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);align-self:center}
+  .resumo dd{font-size:15px;color:var(--ink);word-break:break-word}
+  .evento-box{margin-top:22px;padding:18px 16px;border:1px solid var(--line);border-radius:3px;background:rgba(20,3,7,.6)}
+  .evento-tit{font-family:var(--serif);font-style:italic;font-size:22px;color:#fff}
+  .evento-dh{margin-top:6px;font-size:15px;letter-spacing:.14em;color:var(--red)}
+  .evento-end{margin-top:8px;font-size:14px;line-height:1.5;color:var(--ink-soft)}
+  .mapa{display:inline-block;margin-top:12px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink);
+    text-decoration:none;border-bottom:1px solid var(--red);padding-bottom:3px}
+  .done-view .fine{margin-top:16px}
+  .logo-img{height:64px;width:auto;max-width:170px;object-fit:contain;opacity:.92}
+  .logo-ph{width:128px;height:60px;border:1px dashed rgba(255,80,100,.55);display:grid;place-items:center;
+    font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft);background:rgba(20,3,7,.5)}
+
+  .banner{
+    display:none;margin-bottom:16px;padding:10px 14px;border:1px dashed rgba(255,80,100,.6);
+    font-size:12px;color:#ffb3bd;letter-spacing:.04em;border-radius:3px;background:rgba(125,0,18,.25);
+  }
+  .banner.show{display:block}
+
+  /* ---------- confirmação ---------- */
+  .done-view{display:none;text-align:center;padding:12px 4px}
+  .done-view.show{display:block;animation:fadeUp .9s ease both}
+  .done-view img{width:84px;margin:0 auto 18px;filter:drop-shadow(0 0 16px rgba(255,31,61,.7))}
+  .done-view h2{font-family:var(--serif);font-style:italic;font-weight:500;font-size:34px;line-height:1.1;color:#fff}
+  .done-view p{margin-top:14px;font-family:var(--serif);font-size:19px;line-height:1.5;color:var(--ink-soft)}
+  .done-view .mark{margin-top:22px;font-size:11px;letter-spacing:.36em;text-transform:uppercase;color:var(--red)}
+
+  .is-hidden{display:none !important}
+
+  @media (max-width:380px){
+    .card{padding:26px 18px 22px}
+    .lede{font-size:17px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+    .smoke,.pre-glow{animation:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="stage" aria-hidden="true">
+  <div class="smoke a"></div>
+  <div class="smoke b"></div>
+  <div class="smoke c"></div>
+  <div class="grain"></div>
+</div>
+
+<!-- preloader -->
+<div class="preloader" id="pre" aria-hidden="true">
+  <div class="veu l"></div>
+  <div class="veu r"></div>
+  <div class="pre-core">
+    <div class="pre-glow"></div>
+    <img class="pre-logo" src="assets/ptdj-logo.png" alt="">
+    <div class="pre-line"></div>
+    <div class="pre-kicker">disponibilizando o seu acesso</div>
+  </div>
+</div>
+
+<main id="main">
+  <div class="wrap">
+
+    <div class="brand" id="topo" data-revisao="Topo e logo">
+      <img src="assets/ptdj-logo.png" alt="PTDJ">
+      <div class="eyebrow">festa de lançamento</div>
+      <h1>Confirme a sua presença</h1>
+      <p class="lede">Importante: preencha seus dados para garantir seu translado até a ilha e credenciamento completo.</p>
+    </div>
+
+    <div class="card" id="formulario" data-revisao="Formulário">
+      <div class="banner" id="banner">MODO TESTE: a URL do Apps Script ainda não foi colada no index.html. Nenhum dado está sendo enviado.</div>
+
+      <form id="form" novalidate>
+        <div class="field">
+          <label for="nome">Nome completo</label>
+          <input id="nome" name="nome" type="text" autocomplete="name" placeholder="Como consta no seu documento" required>
+          <div class="err" data-err="nome"></div>
+        </div>
+
+        <div class="field">
+          <label for="insta">Instagram</label>
+          <div class="at">
+            <span>@</span>
+            <input id="insta" name="instagram" type="text" autocomplete="off" autocapitalize="off" placeholder="seu.usuario" required>
+          </div>
+          <div class="err" data-err="instagram"></div>
+        </div>
+
+        <div class="field">
+          <span class="legend">Documento</span>
+          <div class="seg" role="radiogroup" aria-label="Tipo de documento">
+            <input type="radio" id="doc-cpf" name="tipoDoc" value="CPF" checked>
+            <label for="doc-cpf">CPF</label>
+            <input type="radio" id="doc-rg" name="tipoDoc" value="RG">
+            <label for="doc-rg">RG</label>
+          </div>
+          <input id="documento" name="documento" type="text" inputmode="numeric" autocomplete="off" placeholder="000.000.000-00" required>
+          <div class="err" data-err="documento"></div>
+        </div>
+
+        <div class="field">
+          <label for="tel">Telefone com WhatsApp</label>
+          <input id="tel" name="telefone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(00) 00000-0000" required>
+          <div class="err" data-err="telefone"></div>
+        </div>
+
+        <div class="field">
+          <label for="convidadoPor">Convidado por</label>
+          <input id="convidadoPor" name="convidadoPor" type="text" autocomplete="off" placeholder="Nome de quem te convidou" required>
+          <div class="err" data-err="convidadoPor"></div>
+        </div>
+
+        <label class="consent">
+          <input type="checkbox" id="consent" name="consentimento">
+          <span>Autorizo o uso destes dados somente para o controle de acesso deste evento, conforme a LGPD. <a href="#" data-privacy>Entenda</a></span>
+        </label>
+        <div class="err" data-err="consentimento"></div>
+
+        <input class="hp" type="text" name="site" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+        <button class="btn" id="submit" type="submit">Confirmar presença</button>
+        <div class="status" id="status" role="status" aria-live="polite"></div>
+      </form>
+
+      <div class="done-view" id="done" data-revisao="Confirmação (depois de enviar)">
+        <img src="assets/ptdj-logo.png" alt="">
+        <h2>Presença confirmada.</h2>
+        <p>Seu nome está na lista. Apresente o mesmo documento na entrada.</p>
+
+        <dl class="resumo" id="resumo"></dl>
+
+        <div class="evento-box">
+          <div class="evento-tit">Festa de lançamento PTDJ 2</div>
+          <div class="evento-dh">24/11 · 19:00</div>
+          <div class="evento-end">Rua Ilha de Búzios, 31<br>Angra dos Reis</div>
+          <a class="mapa" href="https://www.google.com/maps/search/?api=1&amp;query=Rua+Ilha+de+B%C3%BAzios+31+Angra+dos+Reis" target="_blank" rel="noopener">Abrir no mapa</a>
+        </div>
+        <p class="fine">Confira o endereço e o horário acima. Se algum dado estiver errado, fale com a produção.</p>
+        <div class="mark">PTDJ</div>
+      </div>
+    </div>
+
+    <div class="rodape" id="rodape" data-revisao="Rodapé">
+      <div class="logos" aria-label="Logomarcas">
+        <img class="logo-img" src="assets/fatalfans-branco.png" alt="Fatal Fans">
+      </div>
+      <p class="fine">Use o documento informado para entrar. Dúvidas sobre a lista: fale com a produção.</p>
+    </div>
+  </div>
+</main>
+
+<script>
+(() => {
+  /* ==== CONFIGURAÇÃO ====================================================
+     Cole aqui a URL do Apps Script (termina em /exec). Veja LEIA-ME.md.   */
+  const SCRIPT_URL = 'https://script.google.com/a/macros/street.house/s/AKfycbyRtyziDaxbYU8NsDaCioweCadamX4qkg5pdgY5IE9wbBchKZ_i906cOrDR4o2Cov_c/exec';
+  const MODO_TESTE = SCRIPT_URL.includes('COLE_AQUI');
+  /* ====================================================================== */
+
+  const $ = (s, r = document) => r.querySelector(s);
+  const form = $('#form');
+  const submit = $('#submit');
+  const status = $('#status');
+  const docInput = $('#documento');
+  const tel = $('#tel');
+  const insta = $('#insta');
+  const nome = $('#nome');
+  const consent = $('#consent');
+  const convidadoPor = $('#convidadoPor');
+
+  if (MODO_TESTE) $('#banner').classList.add('show');
+
+  /* ---------- preloader ---------- */
+  const pre = $('#pre');
+  const main = $('#main');
+  const reveal = () => {
+    pre.classList.add('done');
+    main.classList.add('in');
+    setTimeout(() => pre.remove(), 1000);
+  };
+  const minWait = new Promise(r => setTimeout(r, 3400));
+  const loaded = new Promise(r => document.readyState === 'complete' ? r() : window.addEventListener('load', r, { once: true }));
+  Promise.all([minWait, loaded]).then(reveal);
+  setTimeout(reveal, 6000); // rede lenta: nunca prender o visitante na tela de carregamento
+
+  /* ---------- máscaras e validação ---------- */
+  const onlyDigits = v => v.replace(/\D/g, '');
+
+  function maskCPF(v) {
+    const d = onlyDigits(v).slice(0, 11);
+    return d
+      .replace(/^(\d{3})(\d)/, '$1.$2')
+      .replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
+      .replace(/\.(\d{3})(\d)/, '.$1-$2');
+  }
+  function maskPhone(v) {
+    const d = onlyDigits(v).slice(0, 11);
+    if (d.length <= 10) return d.replace(/^(\d{2})(\d)/, '($1) $2').replace(/(\d{4})(\d)/, '$1-$2');
+    return d.replace(/^(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2');
+  }
+
+  function cpfValido(c) {
+    c = onlyDigits(c);
+    if (c.length !== 11 || /^(\d)\1+$/.test(c)) return false;
+    for (let t = 9; t < 11; t++) {
+      let s = 0;
+      for (let i = 0; i < t; i++) s += Number(c[i]) * (t + 1 - i);
+      const d = ((s * 10) % 11) % 10;
+      if (d !== Number(c[t])) return false;
+    }
+    return true;
+  }
+
+  function normInsta(v) {
+    return v.trim()
+      .replace(/^https?:\/\/(www\.)?instagram\.com\//i, '')
+      .replace(/[/?#].*$/, '')
+      .replace(/^@+/, '')
+      .replace(/\s+/g, '');
+  }
+
+  function setErr(name, msg) {
+    const el = document.querySelector(`[data-err="${name}"]`);
+    if (el) el.textContent = msg || '';
+    const input = document.querySelector(`[name="${name}"]`);
+    if (input) input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+  }
+
+  function tipoDoc() {
+    return document.querySelector('input[name="tipoDoc"]:checked').value;
+  }
+
+  function applyDocMode() {
+    const cpf = tipoDoc() === 'CPF';
+    docInput.value = '';
+    docInput.placeholder = cpf ? '000.000.000-00' : 'Número do RG';
+    docInput.setAttribute('inputmode', cpf ? 'numeric' : 'text');
+    docInput.maxLength = 14;
+    setErr('documento', '');
+  }
+
+  document.querySelectorAll('input[name="tipoDoc"]').forEach(r => r.addEventListener('change', applyDocMode));
+
+  docInput.addEventListener('input', () => {
+    if (tipoDoc() === 'CPF') docInput.value = maskCPF(docInput.value);
+    else docInput.value = docInput.value.replace(/[^0-9A-Za-zÀ-ÿ.\-\s]/g, '').slice(0, 14);
+  });
+  tel.addEventListener('input', () => { tel.value = maskPhone(tel.value); });
+  insta.addEventListener('blur', () => { insta.value = normInsta(insta.value); });
+
+  function validar() {
+    let ok = true;
+    const n = nome.value.trim();
+    const nomeOk = /^[\p{L}][\p{L} .'-]+$/u.test(n) && n.split(/\s+/).filter(Boolean).length >= 2;
+    setErr('nome', nomeOk ? '' : 'Informe nome e sobrenome.');
+    ok &&= nomeOk;
+
+    const handle = normInsta(insta.value);
+    const instaOk = /^[A-Za-z0-9._]{1,30}$/.test(handle);
+    setErr('instagram', instaOk ? '' : 'Use só letras, números, ponto e underline.');
+    ok &&= instaOk;
+
+    const doc = docInput.value.trim();
+    let docOk;
+    if (tipoDoc() === 'CPF') docOk = cpfValido(doc);
+    else docOk = /^[0-9A-Za-z.\-]{5,14}$/.test(doc.replace(/\s/g, ''));
+    setErr('documento', docOk ? '' : (tipoDoc() === 'CPF' ? 'CPF inválido. Confira os números.' : 'RG inválido.'));
+    ok &&= docOk;
+
+    const telOk = onlyDigits(tel.value).length >= 10;
+    setErr('telefone', telOk ? '' : 'Informe DDD e número.');
+    ok &&= telOk;
+
+    const conv = convidadoPor.value.trim();
+    const convOk = /^[\p{L}][\p{L} .'-]+$/u.test(conv);
+    setErr('convidadoPor', convOk ? '' : 'Informe o nome de quem te convidou.');
+    ok &&= convOk;
+
+    setErr('consentimento', consent.checked ? '' : 'Marque a autorização para continuar.');
+    ok &&= consent.checked;
+
+    return { ok, handle };
+  }
+
+  /* ---------- envio ---------- */
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    status.textContent = '';
+
+    // honeypot: robô preenche, humano não. Finge sucesso sem enviar.
+    if (form.site.value) return showDone(null);
+
+    const { ok, handle } = validar();
+    if (!ok) {
+      status.textContent = 'Revise os campos destacados.';
+      const first = form.querySelector('[aria-invalid="true"]');
+      if (first) first.focus();
+      return;
+    }
+
+    const payload = {
+      nome: nome.value.trim().replace(/\s+/g, ' '),
+      instagram: '@' + handle,
+      tipoDoc: tipoDoc(),
+      documento: docInput.value.trim(),
+      telefone: tel.value.trim(),
+      convidadoPor: convidadoPor.value.trim().replace(/\s+/g, ' '),
+      consentimento: true,
+      pagina: 'convite-ptdj',
+      enviadoEm: new Date().toISOString()
+    };
+
+    if (MODO_TESTE) {
+      console.warn('[PTDJ] MODO TESTE. Dados não enviados:', payload);
+      return showDone(payload);
+    }
+
+    submit.disabled = true;
+    submit.textContent = 'Enviando…';
+    try {
+      const r = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.erro || 'resposta inválida');
+      showDone(payload);
+    } catch (err) {
+      console.error(err);
+      status.textContent = 'Não consegui enviar agora. Tente de novo em instantes.';
+      submit.disabled = false;
+      submit.textContent = 'Confirmar presença';
+    }
+  });
+
+  function showDone(p) {
+    form.classList.add('is-hidden');
+    if (p) preencherResumo(p);
+    $('.brand h1').textContent = 'Tudo certo.';
+    $('.brand .lede').textContent = 'Seu lugar está garantido.';
+    $('#done').classList.add('show');
+  }
+
+  function preencherResumo(p) {
+    const dl = $('#resumo');
+    const digitos = onlyDigits(p.documento);
+    const docMascarado = p.tipoDoc === 'CPF'
+      ? 'CPF terminado em ' + digitos.slice(-2)
+      : 'RG ' + p.documento.slice(0, 1) + '•••' + p.documento.slice(-2);
+    const linhas = [
+      ['Nome', p.nome],
+      ['Instagram', p.instagram],
+      ['Documento', docMascarado],
+      ['Telefone', p.telefone],
+      ['Convidado por', p.convidadoPor]
+    ];
+    dl.textContent = '';
+    linhas.forEach(([k, v]) => {
+      const dt = document.createElement('dt');
+      dt.textContent = k;
+      const dd = document.createElement('dd');
+      dd.textContent = v;
+      dl.append(dt, dd);
+    });
+  }
+
+  document.querySelector('[data-privacy]').addEventListener('click', (e) => {
+    e.preventDefault();
+    alert('Usamos nome, Instagram, documento (CPF ou RG) e telefone apenas para conferir e liberar a entrada no evento. Os dados ficam em planilha restrita à produção e não são compartilhados.');
+  });
+})();
+</script>
+</body>
+</html>
