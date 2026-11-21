@@ -312,15 +312,6 @@
         </div>
 
         <div class="field">
-          <label for="insta">Instagram</label>
-          <div class="at">
-            <span>@</span>
-            <input id="insta" name="instagram" type="text" autocomplete="off" autocapitalize="off" placeholder="seu.usuario" required>
-          </div>
-          <div class="err" data-err="instagram"></div>
-        </div>
-
-        <div class="field">
           <span class="legend">Documento</span>
           <div class="seg" role="radiogroup" aria-label="Tipo de documento">
             <input type="radio" id="doc-cpf" name="tipoDoc" value="CPF" checked>
@@ -397,7 +388,6 @@
   const status = $('#status');
   const docInput = $('#documento');
   const tel = $('#tel');
-  const insta = $('#insta');
   const nome = $('#nome');
   const consent = $('#consent');
   const convidadoPor = $('#convidadoPor');
@@ -445,14 +435,6 @@
     return true;
   }
 
-  function normInsta(v) {
-    return v.trim()
-      .replace(/^https?:\/\/(www\.)?instagram\.com\//i, '')
-      .replace(/[/?#].*$/, '')
-      .replace(/^@+/, '')
-      .replace(/\s+/g, '');
-  }
-
   function setErr(name, msg) {
     const el = document.querySelector(`[data-err="${name}"]`);
     if (el) el.textContent = msg || '';
@@ -480,7 +462,6 @@
     else docInput.value = docInput.value.replace(/[^0-9A-Za-zÀ-ÿ.\-\s]/g, '').slice(0, 14);
   });
   tel.addEventListener('input', () => { tel.value = maskPhone(tel.value); });
-  insta.addEventListener('blur', () => { insta.value = normInsta(insta.value); });
 
   function validar() {
     let ok = true;
@@ -488,11 +469,6 @@
     const nomeOk = /^[\p{L}][\p{L} .'-]+$/u.test(n) && n.split(/\s+/).filter(Boolean).length >= 2;
     setErr('nome', nomeOk ? '' : 'Informe nome e sobrenome.');
     ok &&= nomeOk;
-
-    const handle = normInsta(insta.value);
-    const instaOk = /^[A-Za-z0-9._]{1,30}$/.test(handle);
-    setErr('instagram', instaOk ? '' : 'Use só letras, números, ponto e underline.');
-    ok &&= instaOk;
 
     const doc = docInput.value.trim();
     let docOk;
@@ -512,8 +488,7 @@
 
     setErr('consentimento', consent.checked ? '' : 'Marque a autorização para continuar.');
     ok &&= consent.checked;
-
-    return { ok, handle };
+    return { ok };
   }
 
   /* ---------- envio ---------- */
@@ -524,7 +499,7 @@
     // honeypot: robô preenche, humano não. Finge sucesso sem enviar.
     if (form.site.value) return showDone(null);
 
-    const { ok, handle } = validar();
+    const { ok } = validar();
     if (!ok) {
       status.textContent = 'Revise os campos destacados.';
       const first = form.querySelector('[aria-invalid="true"]');
@@ -534,7 +509,6 @@
 
     const payload = {
       nome: nome.value.trim().replace(/\s+/g, ' '),
-      instagram: '@' + handle,
       tipoDoc: tipoDoc(),
       documento: docInput.value.trim(),
       telefone: tel.value.trim(),
@@ -584,7 +558,6 @@
       : 'RG ' + p.documento.slice(0, 1) + '•••' + p.documento.slice(-2);
     const linhas = [
       ['Nome', p.nome],
-      ['Instagram', p.instagram],
       ['Documento', docMascarado],
       ['Telefone', p.telefone],
       ['Convidado por', p.convidadoPor]
@@ -601,7 +574,7 @@
 
   document.querySelector('[data-privacy]').addEventListener('click', (e) => {
     e.preventDefault();
-    alert('Usamos nome, Instagram, documento (CPF ou RG) e telefone apenas para conferir e liberar a entrada no evento. Os dados ficam em planilha restrita à produção e não são compartilhados.');
+    alert('Usamos nome, documento (CPF ou RG) e telefone apenas para conferir e liberar a entrada no evento. Os dados ficam em planilha restrita à produção e não são compartilhados.');
   });
 })();
 </script>
